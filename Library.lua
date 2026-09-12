@@ -420,6 +420,30 @@ function Wolf:CreateWindow(Config)
 
 	ContentArea.Parent = MainFrame
 
+    Window.Flags = {}
+
+    local Window = {}
+
+    Window.Gui = WolfUI
+    Window.MainFrame = MainFrame
+    Window.ContentArea = ContentArea
+    Window.TabContainer = TabContainer
+    Window.SearchBox = SearchBox
+
+    Window.Flags = {}
+    Window.Pages = {}
+    Window.Tabs = {}
+    Window.Connections = {}
+    Window.Minimized = false
+
+    function Window:SetFlag(Name, Value)
+        self.Flags[Name] = Value
+    end
+
+    function Window:GetFlag(Name)
+        return self.Flags[Name]
+    end
+
 	---------------------------------------------------------
 	-- Footer
 	---------------------------------------------------------
