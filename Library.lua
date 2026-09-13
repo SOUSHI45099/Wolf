@@ -420,8 +420,6 @@ function Wolf:CreateWindow(Config)
 
 	ContentArea.Parent = MainFrame
 
-    Window.Flags = {}
-
     local Window = {}
 
     Window.Gui = WolfUI
@@ -524,17 +522,6 @@ function Wolf:CreateWindow(Config)
 		})
 	end)
 
-	---------------------------------------------------------
-	-- WINDOW OBJECT
-	---------------------------------------------------------
-
-	local Window = {}
-
-	Window.Gui = WolfUI
-	Window.MainFrame = MainFrame
-	Window.ContentArea = ContentArea
-	Window.TabContainer = TabContainer
-	Window.SearchBox = SearchBox
 
 	---------------------------------------------------------------------
 	-- TAB SYSTEM
@@ -826,7 +813,7 @@ function Wolf:CreateWindow(Config)
 
 			Button.MouseEnter:Connect(function()
 				Tween(Text, {
-					TextColor3 = Wolf.Theme.AccentLight,
+					TextColor3 = Wolf.Theme.Accent,
 				})
 
 				Tween(Underline, {
@@ -902,6 +889,8 @@ function Wolf:CreateWindow(Config)
 	---------------------------------------------------------------------
 	-- SECTION SYSTEM
 	---------------------------------------------------------------------
+
+	local SubPage = SubPage or {}
 
 	function SubPage:AddSection(Config)
 		if typeof(Config) == "string" then
