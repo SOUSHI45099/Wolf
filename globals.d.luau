@@ -40,20 +40,33 @@ declare function dofile(path: string): ()
 -- 2. YOUR WOLF UI EXPORTED TYPES
 -- ==========================================
 export type Theme = {
-    Background: Color3,
-    Accent: Color3,
-    Text: Color3,
+	Background: Color3,
+	Surface: Color3,
+	Surface2: Color3,
+	Sidebar: Color3,
+	Header: Color3,
+	Card: Color3,
+
+	Accent: Color3,
+	AccentDark: Color3,
+	AccentLight: Color3,
+
+	Text: Color3,
+	SubText: Color3,
+
+	Border: Color3,
+	Hover: Color3,
+	ToggleOff: Color3
 }
 
-export type Window = {
-    Title: string,
-    CreateTab: (self: Window, name: string) => any,
-}
-
-export type Library = {
-    Theme: Theme,
-    new: () => Library,
-    CreateWindow: (self: Library, title: string) => Window,
+export type ThemeManager = {
+	SetLibrary: (self: ThemeManager, Library: any) -> (),
+	Register: (self: ThemeManager, Object: GuiObject, Property: string, ColorKey: string) -> (),
+	ApplyTheme: (self: ThemeManager, Name: string) -> (),
+	ApplyToTab: (self: ThemeManager, Tab: any) -> (),
+	GetThemes: (self: ThemeManager) -> {string},
+	GetCurrentTheme: (self: ThemeManager) -> string,
+	AddTheme: (self: ThemeManager, Name: string, ThemeTable: Theme) -> ()
 }
 
 return nil
