@@ -19,12 +19,11 @@ local LocalPlayer = Players.LocalPlayer
 ---------------------------------------------------------------------
 -- ICON MODULE (Lucide + Custom Icons)
 ---------------------------------------------------------------------
-
 local LucideModule
 
 pcall(function()
 	LucideModule = loadstring(
-		game:HttpGet("https://raw.githubusercontent.com/mstudio45/lucide-roblox-direct/refs/heads/main/source.lua")
+		game:HttpGet("https://raw.githubusercontent.com/SOUSHI45099/Assets/refs/heads/main/LucideRoblox.lua")
 	)()
 end)
 
@@ -38,26 +37,38 @@ local function IsValidCustomIcon(Icon: string)
 		)
 end
 
-local function GetLucideIcon(iconName: string)
+local function ApplyLucideIcon(ImageObject: ImageLabel | ImageButton, iconName: string)
+	-- Format pure numbers into rbxassetid format
 	if tonumber(iconName) then
 		iconName = "rbxassetid://" .. iconName
 	end
 
+	-- Check if it's a valid Roblox asset format
 	if IsValidCustomIcon(iconName) then
-		return iconName
+		ImageObject.Image = iconName
+		ImageObject.ImageRectOffset = Vector2.new(0, 0)
+		ImageObject.ImageRectSize = Vector2.new(0, 0)
+		return
 	end
 
+	-- Try fetching from the loaded Lucide module
 	if LucideModule then
 		local Success, Asset = pcall(function()
 			return LucideModule.GetAsset(iconName)
 		end)
 
 		if Success and Asset then
-			return Asset.Url
+			ImageObject.Image = Asset.Url
+			ImageObject.ImageRectOffset = Asset.ImageRectOffset
+			ImageObject.ImageRectSize = Asset.ImageRectSize
+			return
 		end
 	end
 
-	return "rbxassetid://10709782497"
+	-- Fallback default icon if not found or invalid
+	ImageObject.Image = "rbxassetid://10709782497"
+	ImageObject.ImageRectOffset = Vector2.new(0, 0)
+	ImageObject.ImageRectSize = Vector2.new(0, 0)
 end
 
 ---------------------------------------------------------------------
@@ -219,23 +230,33 @@ function Wolf:CreateWindow(Config)
 
 	local SearchBox = Instance.new("TextBox")
 	SearchBox.Name = "SearchBox"
-
 	SearchBox.Position = UDim2.fromOffset(445, 8)
 	SearchBox.Size = UDim2.fromOffset(120, 34)
-
 	SearchBox.BackgroundColor3 = Color3.fromRGB(235, 235, 235)
 	SearchBox.TextColor3 = Color3.fromRGB(20, 20, 20)
-
 	SearchBox.PlaceholderColor3 = Color3.fromRGB(90, 90, 90)
+	SearchBox.Text = ""
 	SearchBox.PlaceholderText = "Search..."
-
 	SearchBox.FontFace = self.Fonts.Body
 	SearchBox.TextSize = 12
 	SearchBox.ClearTextOnFocus = false
-
 	SearchBox.Parent = HeaderFrame
 
 	Corner(SearchBox, 6)
+	local SearchPadding = Instance.new("UIPadding")
+	SearchPadding.PaddingLeft = UDim.new(0, 28)
+	SearchPadding.PaddingRight = UDim.new(0, 6)
+	SearchPadding.Parent = SearchBox
+	
+	local SearchIcon = Instance.new("ImageLabel")
+	SearchIcon.Name = "SearchIcon"
+	SearchIcon.BackgroundTransparency = 1
+	SearchIcon.Size = UDim2.fromOffset(16, 16)
+	SearchIcon.Position = UDim2.new(0, 6, 0.5, 0)
+	SearchIcon.AnchorPoint = Vector2.new(0, 0.5)
+	SearchIcon.ImageColor3 = Color3.fromRGB(90, 90, 90)
+	SearchIcon.Parent = SearchBox
+	ApplyLucideIcon(SearchIcon, "search")
 
 	---------------------------------------------------------
 	-- Lock Button
@@ -264,14 +285,12 @@ function Wolf:CreateWindow(Config)
 
 	local DragIcon = Instance.new("ImageButton")
 	DragIcon.BackgroundTransparency = 1
-
 	DragIcon.Position = UDim2.fromOffset(650, 4)
 	DragIcon.Size = UDim2.fromOffset(40, 40)
-
-	DragIcon.Image = GetLucideIcon("move")
 	DragIcon.ImageColor3 = self.Theme.Accent
-
 	DragIcon.Parent = HeaderFrame
+
+	ApplyLucideIcon(DragIcon, "move")
 
 	---------------------------------------------------------
 	-- Sidebar
@@ -307,9 +326,9 @@ function Wolf:CreateWindow(Config)
 	Avatar.Position = UDim2.fromOffset(12, 18)
 	Avatar.Size = UDim2.fromOffset(50, 50)
 	Avatar.BackgroundTransparency = 1
-	Avatar.Image = GetLucideIcon("user")
 	Avatar.ImageColor3 = self.Theme.Text
 	Avatar.Parent = ProfileCard
+	ApplyLucideIcon(Avatar, "user")
 
 	Corner(Avatar, 100)
 
@@ -362,9 +381,9 @@ function Wolf:CreateWindow(Config)
 		Device = "smartphone"
 	end
 
-	DeviceIcon.Image = GetLucideIcon(Device)
 	DeviceIcon.ImageColor3 = self.Theme.Accent
 	DeviceIcon.Parent = ProfileCard
+	ApplyLucideIcon(DeviceIcon, Device)
 
 	local DeviceLabel = Instance.new("TextLabel")
 	DeviceLabel.BackgroundTransparency = 1
@@ -470,10 +489,9 @@ function Wolf:CreateWindow(Config)
 	ResizeIcon.Size = UDim2.fromOffset(16, 16)
 
 	ResizeIcon.BackgroundTransparency = 1
-	ResizeIcon.Image = GetLucideIcon("move-diagonal-2")
 	ResizeIcon.ImageColor3 = self.Theme.SubText
-
 	ResizeIcon.Parent = Footnote
+	ApplyLucideIcon(ResizeIcon, "move-diagonal-2")
 
 	---------------------------------------------------------
 	-- DRAG WINDOW
@@ -635,12 +653,10 @@ function Wolf:CreateWindow(Config)
 
 		local IconImage = Instance.new("ImageLabel")
 		IconImage.BackgroundTransparency = 1
-
 		IconImage.Position = UDim2.fromOffset(12, 10)
 		IconImage.Size = UDim2.fromOffset(18, 18)
-
-		IconImage.Image = GetLucideIcon(Icon)
 		IconImage.ImageColor3 = Wolf.Theme.SubText
+		ApplyLucideIcon(IconImage, Icon)
 
 		IconImage.Parent = TabButton
 
@@ -951,14 +967,11 @@ function Wolf:CreateWindow(Config)
 
 		local Icon = Instance.new("ImageLabel")
 		Icon.BackgroundTransparency = 1
-
 		Icon.Position = UDim2.fromOffset(12, 12)
 		Icon.Size = UDim2.fromOffset(18, 18)
-
-		Icon.Image = GetLucideIcon(SectionIcon)
 		Icon.ImageColor3 = Wolf.Theme.Accent
-
 		Icon.Parent = Header
+		ApplyLucideIcon(Icon, SectionIcon)
 
 		---------------------------------------------------
 		-- Title
@@ -985,16 +998,12 @@ function Wolf:CreateWindow(Config)
 
 		local Chevron = Instance.new("ImageLabel")
 		Chevron.BackgroundTransparency = 1
-
 		Chevron.AnchorPoint = Vector2.new(1, 0.5)
 		Chevron.Position = UDim2.new(1, -14, 0.5, 0)
-
 		Chevron.Size = UDim2.fromOffset(18, 18)
-
-		Chevron.Image = GetLucideIcon("chevron-down")
 		Chevron.ImageColor3 = Wolf.Theme.SubText
-
 		Chevron.Parent = Header
+		ApplyLucideIcon(Chevron, "chevron-down")
 
 		---------------------------------------------------
 		-- Holder
@@ -1272,9 +1281,9 @@ function Wolf:CreateWindow(Config)
 		Icon.BackgroundTransparency = 1
 		Icon.Position = UDim2.fromOffset(12, 10)
 		Icon.Size = UDim2.fromOffset(18, 18)
-		Icon.Image = GetLucideIcon(Config.Icon or "mouse-pointer")
 		Icon.ImageColor3 = Wolf.Theme.Accent
 		Icon.Parent = Button
+		ApplyLucideIcon(Icon, Config.Icon or "move-pointer")
 
 		local Label = Instance.new("TextLabel")
 		Label.BackgroundTransparency = 1
@@ -1535,9 +1544,9 @@ function Wolf:CreateWindow(Config)
 		Icon.BackgroundTransparency = 1
 		Icon.Position = UDim2.fromOffset(10, 11)
 		Icon.Size = UDim2.fromOffset(18, 18)
-		Icon.Image = GetLucideIcon(Config.Icon or "text-cursor")
 		Icon.ImageColor3 = Wolf.Theme.Accent
 		Icon.Parent = Background
+		ApplyLucideIcon(Icon, Config.Icon or "text-cursor")
 
 		local Box = Instance.new("TextBox")
 		Box.BackgroundTransparency = 1
@@ -1616,9 +1625,9 @@ function Wolf:CreateWindow(Config)
 		Icon.BackgroundTransparency = 1
 		Icon.Position = UDim2.fromOffset(10, 11)
 		Icon.Size = UDim2.fromOffset(18, 18)
-		Icon.Image = GetLucideIcon(Config.Icon or "chevron-down")
 		Icon.ImageColor3 = Wolf.Theme.Accent
 		Icon.Parent = Background
+		ApplyLucideIcon(Icon, Config.Icon or "chevron-down")
 
 		local Label = Instance.new("TextLabel")
 		Label.BackgroundTransparency = 1
@@ -1648,9 +1657,9 @@ function Wolf:CreateWindow(Config)
 		Chevron.AnchorPoint = Vector2.new(1, 0.5)
 		Chevron.Position = UDim2.new(1, -10, 0.5, 0)
 		Chevron.Size = UDim2.fromOffset(16, 16)
-		Chevron.Image = GetLucideIcon("chevron-down")
 		Chevron.ImageColor3 = Wolf.Theme.SubText
 		Chevron.Parent = Background
+		ApplyLucideIcon(Chevron, "chevron-down")
 
 		local ListFrame = Instance.new("Frame")
 		ListFrame.Position = UDim2.fromOffset(0, 42)
@@ -2060,9 +2069,9 @@ function Wolf:CreateWindow(Config)
     ResizeHandle.Position = UDim2.new(1,-4,1,-4)
     ResizeHandle.Size = UDim2.fromOffset(18,18)
     ResizeHandle.BackgroundTransparency = 1
-    ResizeHandle.Image = GetLucideIcon("move-diagonal-2")
     ResizeHandle.ImageColor3 = Wolf.Theme.SubText
     ResizeHandle.Parent = MainFrame
+	ApplyLucideIcon(ResizeHandle, "move-diagonal-2")
     
     local resizing = false
     local resizeStart
@@ -2127,7 +2136,7 @@ function Wolf:CreateWindow(Config)
 
 		    ResizeHandle.Visible = false
 
-		    ResizeIcon.Image = GetLucideIcon("chevron-up")
+			ApplyLucideIcon(ResizeIcon, "chevron-up")
 
 	    else
 
@@ -2141,7 +2150,7 @@ function Wolf:CreateWindow(Config)
 		    	Size = OriginalSize
 		    })
 
-		    ResizeIcon.Image = GetLucideIcon("chevron-down")
+			ApplyLucideIcon(ResizeIcon, "chevron-down")
 
 	    end
 
