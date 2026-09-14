@@ -4,6 +4,5 @@ return {
     Library = (require(script.Parent.Library) :: any) :: WolfTypes.Library,
     Types = WolfTypes,
     SaveManager = require(script.Parent.SaveManager),
-    ThemeManager = require(script.Parent.ThemeManager),
-    Lucide = require(script.Parent.Lucide)
+    ThemeManager = require(script.Parent.ThemeManager)
 }
