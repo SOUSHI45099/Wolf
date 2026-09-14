@@ -1,8 +1,24 @@
-local WolfTypes = require(script.Parent["globals.d"])
+local BASE_URL = "https://raw.githubusercontent.com/SOUSHI45099/Wolf/main/"
 
+local function loadModule(path: string)
+    local source = game:HttpGet(BASE_URL .. path)
+    local loadedFunction, syntaxError = loadstring(source)
+    
+    if not loadedFunction then
+        error("[Wolf Loader] Failed to load module '" .. path .. "': " .. tostring(syntaxError))
+    end
+    
+    return loadedFunction()
+end
+
+-- Load the runtime logic (omitting globals.d.luau)
+local Library = loadModule("Library.lua")
+local SaveManager = loadModule("addons/Savemanager.lua")
+local ThemeManager = loadModule("addons/ThemeManager.lua")
+
+-- Return the exact exported structure your library expects
 return {
-    Library = (require(script.Parent.Library) :: any) :: WolfTypes.Library,
-    Types = WolfTypes,
-    SaveManager = require(script.Parent.SaveManager),
-    ThemeManager = require(script.Parent.ThemeManager)
+    Library = Library,
+    SaveManager = SaveManager,
+    ThemeManager = ThemeManager
 }
