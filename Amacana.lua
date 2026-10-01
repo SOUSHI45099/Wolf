@@ -861,7 +861,7 @@ local function CreateEnableShortcut()
 	EnableShortcutButton.Size = UDim2.fromOffset(48, 48)
 	EnableShortcutButton.Position = UDim2.new(0.5, -24, 0.72, 0)
 	EnableShortcutButton.BackgroundColor3 = DARK
-	EnableShortcutButton.BackgroundTransparency = 0.04
+	EnableShortcutButton.BackgroundTransparency = 0.55
 	EnableShortcutButton.BorderSizePixel = 0
 	EnableShortcutButton.AutoButtonColor = false
 	EnableShortcutButton.Text = ""
@@ -871,14 +871,7 @@ local function CreateEnableShortcut()
 	addCorner(EnableShortcutButton, 11)
 	addStroke(EnableShortcutButton, 0.55)
 
-	CreateIcon(
-		EnableShortcutButton,
-		"crosshair",
-		UDim2.new(0.5, -10, 0.5, -10),
-		UDim2.fromOffset(20, 20),
-		WHITE,
-		11
-	)
+	CreateIcon(EnableShortcutButton, "crosshair", UDim2.new(0.5, -10, 0.5, -10), UDim2.fromOffset(20, 20), WHITE, 11)
 
 	local DragStart = nil
 	local StartPosition = nil
@@ -889,8 +882,10 @@ local function CreateEnableShortcut()
 	local DRAG_THRESHOLD = 7
 
 	ShortcutConnections[#ShortcutConnections + 1] = EnableShortcutButton.InputBegan:Connect(function(input)
-		if input.UserInputType ~= Enum.UserInputType.MouseButton1
-			and input.UserInputType ~= Enum.UserInputType.Touch then
+		if
+			input.UserInputType ~= Enum.UserInputType.MouseButton1
+			and input.UserInputType ~= Enum.UserInputType.Touch
+		then
 			return
 		end
 
@@ -902,8 +897,10 @@ local function CreateEnableShortcut()
 	end)
 
 	ShortcutConnections[#ShortcutConnections + 1] = EnableShortcutButton.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement
-			or input.UserInputType == Enum.UserInputType.Touch then
+		if
+			input.UserInputType == Enum.UserInputType.MouseMovement
+			or input.UserInputType == Enum.UserInputType.Touch
+		then
 			DragInput = input
 		end
 	end)
@@ -954,7 +951,6 @@ local function CreateEnableShortcut()
 	setShortcutTriggerVisual(true)
 	UpdateEnableShortcutVisual()
 end
-
 
 local ShowFOVBtn = createToggle(LeftPanel, "Show FOV Circle", 51, CONFIG.showFOV, function(v)
 	CONFIG.showFOV = v
@@ -1249,14 +1245,7 @@ end)
 ShortcutTriggerBtn = makePanelButton(LeftPanel, "", 342, 34)
 ShortcutTriggerBtn.Name = "EnableShortcutTrigger"
 
-CreateIcon(
-	ShortcutTriggerBtn,
-	"plug-zap",
-	UDim2.fromOffset(10, 9),
-	UDim2.fromOffset(16, 16),
-	MUTED,
-	4
-)
+CreateIcon(ShortcutTriggerBtn, "plug-zap", UDim2.fromOffset(10, 9), UDim2.fromOffset(16, 16), MUTED, 4)
 
 local ShortcutTriggerLabel = Instance.new("TextLabel")
 ShortcutTriggerLabel.Name = "Label"
@@ -1317,7 +1306,7 @@ RefreshText.TextXAlignment = Enum.TextXAlignment.Left
 RefreshText.Parent = RefreshBtn
 
 local ServerLabel = Instance.new("TextLabel")
-ServerLabel.Size = UDim2.new(1, -20, 0, 18)
+ServerLabel.Size = UDim2.new(1, -54, 0, 18)
 ServerLabel.Position = UDim2.fromOffset(10, 51)
 ServerLabel.BackgroundTransparency = 1
 ServerLabel.Text = "SERVER PLAYERS  /  SELECT TO TARGET"
@@ -1326,6 +1315,23 @@ ServerLabel.TextSize = 9
 ServerLabel.Font = Enum.Font.GothamBold
 ServerLabel.TextXAlignment = Enum.TextXAlignment.Left
 ServerLabel.Parent = RightPanel
+
+--// SELECT ALL PLAYERS BUTTON
+local SelectAllPlayersBtn = Instance.new("TextButton")
+SelectAllPlayersBtn.Name = "SelectAllPlayers"
+SelectAllPlayersBtn.Size = UDim2.fromOffset(28, 24)
+SelectAllPlayersBtn.Position = UDim2.new(1, -38, 0, 48)
+SelectAllPlayersBtn.BackgroundColor3 = DARK
+SelectAllPlayersBtn.BorderSizePixel = 0
+SelectAllPlayersBtn.Text = ""
+SelectAllPlayersBtn.AutoButtonColor = false
+SelectAllPlayersBtn.Parent = RightPanel
+
+addCorner(SelectAllPlayersBtn, 7)
+addStroke(SelectAllPlayersBtn, 0.78)
+addButtonFX(SelectAllPlayersBtn)
+
+CreateIcon(SelectAllPlayersBtn, "user", UDim2.new(0.5, -8, 0.5, -8), UDim2.fromOffset(16, 16), MUTED, 4)
 
 local ServerScroll = Instance.new("ScrollingFrame")
 ServerScroll.Name = "ServerPlayers"
@@ -1346,6 +1352,44 @@ local ServerLayout = Instance.new("UIListLayout")
 ServerLayout.Padding = UDim.new(0, 5)
 ServerLayout.SortOrder = Enum.SortOrder.LayoutOrder
 ServerLayout.Parent = ServerScroll
+
+SelectAllPlayersBtn.MouseButton1Click:Connect(function()
+	local players = Players:GetPlayers()
+
+	-- Check whether every server player is already selected
+	local allSelected = true
+
+	for _, player in ipairs(players) do
+		if player ~= localPlayer then
+			if not isUserTrusted(player.Name) then
+				allSelected = false
+				break
+			end
+		end
+	end
+
+	-- Toggle all players
+	for _, player in ipairs(players) do
+		if player ~= localPlayer then
+			local selected = isUserTrusted(player.Name)
+
+			if allSelected then
+				-- Deselect everyone
+				if selected then
+					toggleTrustUser(player.Name)
+				end
+			else
+				-- Select everyone
+				if not selected then
+					toggleTrustUser(player.Name)
+				end
+			end
+		end
+	end
+
+	updateLists()
+	saveConfig()
+end)
 
 local TrustedHeaderLabel = Instance.new("TextLabel")
 TrustedHeaderLabel.Size = UDim2.new(1, -58, 0, 18)
