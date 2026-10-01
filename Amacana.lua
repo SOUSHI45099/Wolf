@@ -259,7 +259,9 @@ local function isTeammate(targetCharacter)
 	end
 
 	if CONFIG.teamCheckMode == "Roblox Team" then
-		return player.Team and localPlayer.Team and player.Team == localPlayer.Team
+		if player.Team and localPlayer.Team then
+		    return player.Team == localPlayer.Team
+	    end
 	elseif CONFIG.teamCheckMode == "Trusted Players" then
 		return isUserTrusted(player.Name)
 	elseif CONFIG.teamCheckMode == "Targeted Player" then
